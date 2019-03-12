@@ -42,8 +42,8 @@ In summary, the goals of the project are as follows.
 - Implement AI algorithms using the information acquired from the back-end and present the gathered strategies to the user with the front-end
 
 ### List of planned AI strategies: 
-- General Tree-Search (Depth First Search, Breadth First Search, Uniform Cost Search/Dijkstra's Algorithm, A* Search using consistent and admissible heuristics)
-- Adversarial Search (Minimax, Minimax with Alpha-Beta Pruning, Expectimax)
-- Model-Based Reinforcement Learning (Value Iteration, Policy Iteration)
-- Model-Free Reinforcement Learning (Q-learning and Approximate Q-learning)
-- Constraint Satisfaction algorithms (Backtracking Search with MRV and LCV heuristics, DPLL).
+- **General Tree-Search** (Depth First Search, Breadth First Search, Uniform Cost Search/Dijkstra's Algorithm, A* Search using consistent and admissible heuristics)
+- **Adversarial Search** (Minimax, Minimax with Alpha-Beta Pruning, Expectimax)
+- **Model-Based Reinforcement Learning** (Value Iteration, Policy Iteration)
+- **Model-Free Reinforcement Learning** (Q-learning and Approximate Q-learning)
+- **Constraint Satisfaction algorithms** (Backtracking Search with MRV and LCV heuristics, DPLL).
