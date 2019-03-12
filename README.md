@@ -31,9 +31,9 @@ Currently I am using the Tkinter graphics library and mimicking the original col
 I also have a healthy appreciation for all the hard work front-end designers do now; I won't laugh when I hear UI design anymore, I promise!
 
 ## Ultimate Goal: AI!
-Finally, the ultimate goal of this project is to design a custom built environment developed specifically to integrate with various types of AI algorithms, from general tree search (in the deterministic, fully-observable case) to various types of reinforcement learning models. 
+Finally, the ultimate goal of this project is to design a custom built environment developed specifically to integrate with various types of AI algorithms, from general tree search (in the deterministic, fully-observable case) to reinforcement learning models. 
 
-I wish to use this platform to demonstrate the various types of AI strategies in a easily presentable and graphical way on a relatively challenging problem (the game "2048" with the various modifications I've made to the rules). 
+I wish to use this platform to demonstrate the various types of AI strategies in a easily presentable and graphical way on a relatively challenging problem (the game "2048" with the modifications I've made to the rules). 
 
 ## In Summary
 In summary, the goals of the project are as follows.
