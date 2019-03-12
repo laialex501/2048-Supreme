@@ -15,7 +15,7 @@ This game additionally aspires to allow players to use bases other than 2; for e
 ## Development Challenges
 
 ### Back-End
-The requirements above already impose significant design challenges in producing a flexible back-end able to adapt to any of these circumstances.I have been forced to seriously consider the data structures and runtime complexity of my algorithms, given that the board size could theoretically scale to infinity. 
+The requirements above already impose significant design challenges in producing a flexible back-end able to adapt to any of the circumstances given. I have been forced to seriously consider the data structures and runtime complexity of my algorithms, given that the board size could theoretically scale to infinity. 
 
 Currently each move of the game runs in *O(n<sup>2</sup>m)* time, where *n* is the number of columns on the board and *m* is the number of rows. While the polynomial time provokes some frowning, believe this to at the very least be close to the optimal solution. 
 
