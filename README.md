@@ -21,7 +21,7 @@ Currently each move of the game runs in *O(n<sup>2</sup>m)* time, where *n* is t
 
 As a short proof, at minimum we have to consider every tile on the board in the new state, which is *O(nm)* operations. However, given that collisions and merges are expected, we also need to consider how the columns affect one another with each sub-movement. Therefore this is *O(n<sup>2</sup>m)* time. 
 
-If we consider the runtime in terms of the number of tiles $T = O(nm)$, then this is *θ(T<sup>1.5</sup>)* in the case of a square board and *θ(T<sup>2</sup>)* in the worst case when *n >> m*. 
+If we consider the runtime in terms of the number of tiles *T = O(nm)*, then this is *θ(T<sup>1.5</sup>)* in the case of a square board and *θ(T<sup>2</sup>)* in the worst case when *n >> m*. 
 
 ### Front-End
 In addition to the challenges of the back-end, I have also imposed the requirement of designing and implementing a functional front-end and GUI, including animations for the player to interact with. Given that I have never built a front-end design before, it has been exciting to teach myself how to develop this type of interface. 
