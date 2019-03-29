@@ -27,6 +27,7 @@ class Game_2048:
     prime = 2
     game_over = 0
     win = 0
+    main_actions = ["left", "up", "right", "down"]
     actions = ["left", "up", "right", "down", '0', '1', '2', '3', 
                0, 1, 2, 3, "a", "w", "d", "s"]
     history = []
@@ -47,18 +48,25 @@ class Game_2048:
         prime = the base prime number of this game
         goal = the goal number to achieve to win
         board_array = a custom np array to use as a board
-        """
+        """ 
+        # create initial board
         if board_array is None:
-            self.board = np.zeros((m, n))
-            self.m = m
-            self.n = n
+            self.m = int(m)
+            self.n = int(n)
+            self.board = np.zeros((self.m, self.n))
         else:
             self.board = board_array
             
-        self.goal = goal
+        # set goal
+        if self.goal == "Endless":
+            self.goal = float('inf')
+        else:
+            self.goal = goal
+
         self.prime = prime
-        self.game_over = 0
-        self.win = 0
+        self.score = 0
+        self.game_over = False
+        self.win = False
         self.history = []
         self.move_history = []
         self.fill_history = []
@@ -92,7 +100,6 @@ class Game_2048:
             self.fill_history.append((i[rnd], j[rnd]))
         else:
             self.filled_last_time = False
-            self.game_over = 1
         return modBoard
             
     # deprecated function, no longer used! kept around for record purposes
@@ -204,7 +211,7 @@ class Game_2048:
                                 break
         return modBoard
     
-    def get_successor(self, board): 
+    def move_left(self, board): 
         """
         Moves all blocks to the left in the given board 
         
@@ -351,7 +358,7 @@ class Game_2048:
             # rotate board to perform left shift movement
             board = np.rot90(board, movement)
             # find desired values from movement operation
-            board, move_dist, merge_array = self.get_successor(board)
+            board, move_dist, merge_array = self.move_left(board)
             # rotate back to acquire correctly oriented version
             board = np.rot90(board, -movement)
             move_dist = np.rot90(move_dist, -movement)
@@ -368,25 +375,81 @@ class Game_2048:
                 self.board = board
             else:
                 self.board_state_changed = False
+                
+            # update our game status
+            self.update_game_status()
             return True
         else:
             print("Error. Please enter one of the following: left, up, right, down. \n \
             Alternatively, type: 0, 1, 2, or 3")
             return False
-    
-    def is_game_over(self):
+        
+    def get_successor(self, state, action):
         """
-        Checks if the game is over.
+        Gets the successor state from performing the specified action
+        """
+        board = np.copy(state)
+        movement = self.get_action(action)
+        if movement is None:
+            print('Error, retrieved incorrect command')
+            return board
+        # rotate board to perform left shift movement
+        board = np.rot90(board, movement)
+        # find desired values from movement operation
+        board, move_dist, merge_array = self.move_left(board)
+        # rotate back to acquire correctly oriented version
+        board = np.rot90(board, -movement)
+        return board
+
+    def takeAction(self, action):
+        """
+        Takes an action and returns the new state we entered
+        """
+        self.move(action)
+        return self.get_current_state()
+    
+    def check_game_status(self):
+        """
+        Returns a tuple of (is_game_over?, is_win?)
+        """
+        return (self.game_over, self.win)
+
+    def update_game_status(self):
+        """
+        Checks if the game is over. Updates self.game_over and self.win with the correct value.
         
         Outputs:
         --------
-        1: game is over
-        0 : game is ongoing
+        True: game is over
+        False : game is ongoing
         """
-        if self.game_over == 1 or self.is_win() == 1:
-            return 1
+        loss = True
+        for col in range(self.n):
+            for row in range(self.m):
+                # We won
+                #print('Comparing {0} to {1} (goal)'.format(int(self.board[col][row]), self.goal))
+                if float(self.board[row][col]) == float(self.goal):
+                    #print('reached win condition')
+                    self.win = True
+                    self.game_over = True
+                    return True
+                # Checks if the game is still ongoing. If conditions do not hold for all tiles, we lost
+                if self.board[row][col] == 0:
+                    loss = False
+                if (col+1 < self.n) and (self.board[row][col+1] == self.board[row][col]):
+                    loss = False
+                if (row+1 < self.m) and (self.board[row+1][col] == self.board[row][col]):
+                    loss = False
+
+        # If we lost, then game over. If we have not lost nor won, game ongoing.
+        if loss == True:
+            self.game_over = True
+            self.win = False
+            return True
         else:
-            return 0
+            self.game_over = False
+            self.win = False
+            return False
         
     def is_win(self):
         """
@@ -398,9 +461,41 @@ class Game_2048:
         0: we lost
         """
         for block in np.nditer(self.board):
-            if block == self.goal:
-                return 1
-        return 0
+            if block >= self.goal:
+                return True
+        return False
+
+    def is_loss(self):
+        """
+        Checks if we lost the game
+
+        If the left and bottom tiles (if they exist) are equal for any tile, we have not lost yet. If a tile is still empty,
+        we have not lost yet.
+        """
+        for col in range(self.n):
+            for row in range(self.m):
+                if self.board[row][col] == 0:
+                    return False
+                if (col+1 < self.n) and (self.board[row][col+1] == self.board[row][col]):
+                    return False
+                if (row+1 < self.m) and (self.board[row+1][col] == self.board[row][col]):
+                    return False
+        return True
+    
+    def get_goal(self):
+        """
+        Returns our current goal.
+        """
+        return self.goal
+
+    def get_score(self):
+        """
+        Gets our current score.
+        """
+        score = 0
+        for tile in np.nditer(self.board):
+            score += tile
+        return score
     
     def get_val(self, x, y):
         """
@@ -408,11 +503,25 @@ class Game_2048:
         """
         return int(self.board[y][x])
     
-    def get_legal_actions(self):
+    def get_all_legal_actions(self):
         """
-        Returns a list of legal actions
+        Returns a list of all possible actions
         """
         return self.actions
+
+    def get_legal_actions(self, state):
+        """
+        Returns a list of legal actions at a given state (that actually do something)
+
+        Tries left, up, right, and down movements, and sees which ones actually change
+        the board state
+        """
+        legal_actions = []
+        for action in self.main_actions:
+            board = self.get_successor(state, action)
+            if not np.array_equal(state, board):
+                legal_actions.append(action)
+        return legal_actions
     
     def get_current_state(self):
         """
@@ -544,4 +653,3 @@ class Game_2048:
             last_state = self.history.pop()
             last_move_hist = self.move_history.pop()
             self.board = last_state 
-            
