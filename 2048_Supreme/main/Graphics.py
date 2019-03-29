@@ -7,7 +7,13 @@ from Game_World import Game_2048
 
 class StartGame:
     BG = "#fbf8ef"
+    ROOT_BASE_WIDTH = 512
+    ROOT_BASE_HEIGHT = 512
     TITLE = "2048 Supreme"
+    TITLE_TEXT_COLOR = "White"
+    SUPREME_COLOR = "#756e64"
+    TITLE_HIGHLIGHT_COLOR = "Orange"
+    TEXT_COLOR = "#796860"
     TITLE_FONT = ("Helvetica", 28)
     TILE_FONT = ("Helvetica", 16)
     TILE_SIZE = 100
@@ -22,30 +28,138 @@ class StartGame:
                    32: "white", 64: "white", 128: "white", 256: "white", 
                    512: "white", 1024: "white", 2048: "white"}
     TILE_REPO = {}
-    ANIMATION_DELAY = .005
+    ANIMATION_DELAY = .01
+    BEGIN_ANIMATION_DELAY = .01
     TILE_PRE_EXPAND_SIZE = 20
     TILE_SCALE_SPEED = 5
     ANIMATION_EXPAND_DELAY = .01
     
     def __init__(self):
         self.GAME = Game_2048()
+        # now a constant value
+        self.TILE_REPO = {}
+        self.finish_animation = True
+        
+        self.root = tk.Tk()
+        self.root.title(self.TITLE)
+        # fix root sizing
+        self.root.configure(bg=self.BG, width=self.ROOT_BASE_WIDTH, height=self.ROOT_BASE_HEIGHT)
+
+        self.currentFrame = tk.Frame(self.root)
+        # should resize after changing into game
+        self.enterMainFrame()
+        
+        self.root.bind_all("<Escape>", self.quit)
+        
+        self.root.mainloop()
+
+    def setupGenericFrame(self):
+        self.root.configure(bg=self.BG, width=self.ROOT_BASE_WIDTH, height=self.ROOT_BASE_HEIGHT)
+        genericFrame = tk.Frame(self.root)
+        genericFrame.configure(bg=self.BG, width=self.ROOT_BASE_WIDTH, height=self.ROOT_BASE_HEIGHT)
+        genericFrame.pack_propagate(True)
+        return genericFrame
+    
+    def setupGameFrame(self):
         self.numRows = self.GAME.m
         self.numCols = self.GAME.n
         self.boardHeight = self.numRows * self.TILE_SIZE + (self.numRows+1) * self.TILE_SPACING
         self.boardWidth = self.numCols * self.TILE_SIZE + (self.numCols+1) * self.TILE_SPACING
-        self.TILE_REPO = {}
-        self.finish_animation = True
+        rootWidth = self.boardWidth * 2
+        rootHeight = self.boardHeight * 2
+        self.root.configure(bg=self.BG, width=rootWidth, height=rootHeight)
+        gameFrame = tk.Frame(self.root)
+        gameFrame.configure(bg=self.BG, width=rootWidth, height=rootHeight)
         
-        # root window
-        self.root = tk.Tk()
-        self.root.title(self.TITLE)
-        self.root.configure(bg=self.BG, width=self.boardWidth * 2, height=self.boardHeight*2)
-        title=tk.Label(self.root, text=self.TITLE, bg=self.BG, fg="#756e64", font=self.TITLE_FONT)
+        return gameFrame
+
+    def enterMainFrame(self):
+        self.currentFrame.pack_forget()
+        self.currentFrame.destroy()
+        mainFrame = self.setupGenericFrame()
+        mainFrame.pack_propagate(False)
+        mainFrame.pack(fill=tk.BOTH, expand=True)
+        self.currentFrame = mainFrame
+
+        mainTitle = tk.Label(mainFrame, text="2048 Supreme", bg=self.TITLE_HIGHLIGHT_COLOR, fg=self.TITLE_TEXT_COLOR, font=self.TITLE_FONT, padx=10, pady=10)
+        mainTitle.pack(fill=tk.X, expand=True)
+
+        version = tk.Label(mainFrame, text="v. 1.0", bg=self.BG, fg=self.TEXT_COLOR, font=self.TILE_FONT, padx=5, pady=5)
+        version.pack(fill=tk.X, expand=False, side=tk.TOP)
+
+        author = tk.Label(mainFrame, text="by Alex Lai, UC Berkeley", bg=self.BG, fg=self.TEXT_COLOR, font=self.TILE_FONT, padx=5, pady=5)
+        author.pack(fill=tk.X, expand=True, side=tk.TOP)
+
+        startNewGame = tk.Button(mainFrame, text="Start New Game", command=lambda: self.enterOptionsFrame(), padx=5, pady=5)
+        startNewGame.pack(expand=True)
+
+    def enterOptionsFrame(self):
+        self.currentFrame.pack_forget()
+        self.currentFrame.destroy()
+        optionsFrame = self.setupGenericFrame()
+        optionsFrame.pack_propagate(False)
+        optionsFrame.pack(fill=tk.BOTH, expand=True)
+       	self.currentFrame = optionsFrame
+
+        boardDimensions = tk.Label(optionsFrame, text="Board Dimensions", bg=self.TITLE_HIGHLIGHT_COLOR, fg="White", 
+                                   font=self.TILE_FONT, padx=10, pady=10)
+        boardDimensions.pack(fill=tk.X, expand=True, side=tk.TOP)
+
+        width = tk.Label(optionsFrame, text="Width", bg="Orange", fg="White", padx=5, pady=5)
+        width.pack(expand=True)
+
+        widthOptions = [4, 5, 6, 7, 8, 9, 10]
+        widthVar = tk.StringVar(optionsFrame)
+        widthVar.set(widthOptions[0])
+        widthMenu = tk.OptionMenu(optionsFrame, widthVar, *widthOptions)
+        widthMenu.pack(expand=True)
+
+        height = tk.Label(optionsFrame, text="Height", bg=self.BG, fg=self.TEXT_COLOR, padx=5, pady=5)
+        height.pack(expand=True)
+
+        heightOptions = [4, 5, 6, 7, 8, 9, 10]
+        heightVar = tk.StringVar(optionsFrame)
+        heightVar.set(heightOptions[0])
+        heightMenu = tk.OptionMenu(optionsFrame, heightVar, *heightOptions)
+        heightMenu.pack(expand=True)
+
+        gameOptions = tk.Label(optionsFrame, text="Game Options", bg="Orange", fg="White", 
+                               font=self.TILE_FONT, padx=10, pady=10)
+        gameOptions.pack(fill=tk.X, expand=1, side=tk.TOP)
+
+        goal = tk.Label(optionsFrame, text="Goal", bg="Orange", fg="White", padx=5, pady=5)
+        goal.pack(expand=0)
+
+        goalOptions = [4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, "Endless"]
+        goalVar = tk.StringVar(optionsFrame)
+        goalVar.set(2048)
+        goalMenu = tk.OptionMenu(optionsFrame, goalVar, *goalOptions)
+        goalMenu.pack(expand=True)
+
+        startGameButton = tk.Button(optionsFrame, text="Start Game", 
+                                    command=lambda: self.enterGameFrame(widthVar.get(), heightVar.get(), goalVar.get()), 
+                                    padx=5, pady=5)
+        startGameButton.pack(expand=True)
+
+        returnToMenuButton = tk.Button(optionsFrame, text="Return to Main Menu", command=lambda: self.enterMainFrame(), padx=5, pady=5)
+        returnToMenuButton.pack(expand=True)
+        
+    def enterGameFrame(self, width=4, height=4, goal=2048):
+        #print("Width: {0}, Height: {1}, Goal: {2}".format(width, height, goal))
+        # remove current frame
+        self.currentFrame.pack_forget()
+        self.currentFrame.destroy()
+        # setup new gameFrame
+        self.GAME = Game_2048(m=height, n=width, goal=goal)
+        gameFrame = self.setupGameFrame()
+        gameFrame.pack()
+        self.currentFrame = gameFrame
+        
+        title=tk.Label(gameFrame, text=self.TITLE, bg=self.BG, fg=self.SUPREME_COLOR, font=self.TITLE_FONT, padx=10, pady=10)
         title.pack()
         
-        
         # Main Board
-        boardFrame = tk.Frame(self.root, width=self.boardWidth+20, height=self.boardHeight+20, bg=self.BG, padx=10, pady=10)
+        boardFrame = tk.Frame(gameFrame, width=self.boardWidth+20, height=self.boardHeight+20, bg=self.BG, padx=10, pady=10)
         boardFrame.pack()
         
         self.canvas = tk.Canvas(boardFrame, width=self.boardWidth, height=self.boardHeight, bg="#baaea0", borderwidth=0)
@@ -54,19 +168,41 @@ class StartGame:
         self.init_board()
         
         # Command Frame and Buttons
-        commandFrame=tk.Frame(self.root, width=self.boardWidth, height=100, bg=self.BG, pady=10, padx=10)
+        commandFrame=tk.Frame(gameFrame, width=self.boardWidth, height=100, bg=self.BG, pady=10, padx=10)
         commandFrame.pack()
         
         self.set_command_buttons(commandFrame)
         
-        # Quit Button
-        quitButton = tk.Button(self.root, text="Quit", padx=5, pady=5)
-        quitButton.pack(side=tk.BOTTOM)
-        quitButton.bind("<Button 1>", self.quit)
+        # Return Button
+        returnButton = tk.Button(gameFrame, text="Return to Main Menu", command=lambda: self.enterMainFrame(), padx=5, pady=5)
+        returnButton.pack(side=tk.BOTTOM)
         
-        self.root.bind_all("<Escape>", self.quit)
-        
-        self.root.mainloop()
+    def enterEndGameFrame(self, is_game_over, is_win):
+    	# remove current frame
+        self.currentFrame.pack_forget()
+        self.currentFrame.destroy()
+
+        endGameFrame = self.setupGenericFrame()
+        endGameFrame.pack_propagate(False)
+        endGameFrame.pack()
+        self.currentFrame = endGameFrame
+
+        if is_win == True:
+        	gameStatusText = "Congrats, you won!"
+        else:
+        	gameStatusText = "Sorry, you lost."
+
+        gameStatus = tk.Label(endGameFrame, text=gameStatusText, bg=self.TITLE_HIGHLIGHT_COLOR, fg=self.TITLE_TEXT_COLOR, font=self.TITLE_FONT, padx=10, pady=10)
+        gameStatus.pack(fill=tk.X, expand=True)
+
+        score_val = self.GAME.get_score()
+        scoreText = "Your score was {0}".format(int(score_val))
+
+       	score = tk.Label(endGameFrame, text=scoreText, bg=self.BG, fg=self.TEXT_COLOR, font=self.TILE_FONT, padx=10, pady=10)
+       	score.pack(fill=tk.X, expand=True)
+
+       	returnToMenuButton = tk.Button(endGameFrame, text="Return to Main Menu", command=lambda: self.enterMainFrame(), padx=5, pady=5)
+        returnToMenuButton.pack(expand=True)
         
     def create_frames(self, root):
         pass
@@ -107,12 +243,18 @@ class StartGame:
             command = str(event.widget.cget("text")).lower().strip()
         else:
             command = str(event.keysym).lower().strip()
-        if command in self.GAME.get_legal_actions():
+        if command in self.GAME.get_all_legal_actions():
             if self.finish_animation == True:
                 self.GAME.move(command)
                 # if the board state changed, then we animate our movement
                 if self.GAME.get_board_state_changed():
                     self.finish_animation = self.animate_move()
+                    # check if the game is now ever
+                    is_game_over, is_win = self.GAME.check_game_status()
+                    #print("is_game_over: {0}, is_win: {1}, goal: {2}".format(is_game_over, is_win, self.GAME.goal))
+                    if is_game_over:
+                        self.enterEndGameFrame(is_game_over, is_win)
+                    time.sleep(self.BEGIN_ANIMATION_DELAY)
             else:
                 print('Please wait for animation to finish before trying next move.')
         
@@ -466,4 +608,3 @@ class StartGame:
             except AttributeError:
                 print('Exception occured')
                 return False
-        

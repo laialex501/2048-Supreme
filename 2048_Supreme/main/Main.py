@@ -12,8 +12,6 @@ from Graphics import StartGame
 
 def main():
 	MainGame = StartGame()
-	if MainGame.GAME.is_game_over():
-		print('Game Over!')
 
 if __name__ == "__main__":
 	main()
