@@ -28,7 +28,7 @@ In addition to the challenges of the back-end, I have also imposed the requireme
 
 Currently I am using the Tkinter graphics library and mimicking the original color scheme of the base 2048 game. 
 
-I also have a healthy appreciation for all the hard work front-end designers do now; I won't laugh when I hear UI design anymore, I promise!
+I also have a healthy appreciation for all the hard work front-end designers do now!
 
 ## Ultimate Goal: AI!
 Finally, the ultimate goal of this project is to design a custom built environment developed specifically to integrate with various types of AI algorithms, from general tree search (in the deterministic, fully-observable case) to reinforcement learning models. 
